@@ -2,21 +2,25 @@
 #include <stdlib.h>
 #include <string.h>
 
-struct data {
+typedef struct data {
     int dataNum;
     char *taxA;
     char *taxB;
     int relation;
-} typedef struct data data;
+} data;
 
 FILE *filePointer(char fileName[], char *mode);
-
 
 int main (int argc, char *argv[])
 {
     FILE *filePtr = NULL;
     char fileName[255];
-    int c;
+    int c, i;
+    char array[300][500];
+    char line[10000];
+    for (i=0; i < 10000; i++) {
+        line [i] = '*';
+    }
 
     if(argc < 2) {
         strcpy (fileName, "NO FILE INPUT");
@@ -25,6 +29,10 @@ int main (int argc, char *argv[])
         strcpy (fileName, argv[1]);
     }
     filePtr = filePointer (fileName, "r"); /*Call to function to find file pointer*/
+    for(i = 0; i < 300; i++) {
+        fscanf(filePtr, "%s", line);
+        printf("%s\n", line);
+    }
 
 
     fclose(filePtr);
