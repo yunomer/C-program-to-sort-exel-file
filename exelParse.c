@@ -2,13 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-typedef struct data {
-    int dataNum;
-    char *taxA;
-    char *taxB;
-    int relation;
-} data;
-
 FILE *filePointer(char fileName[], char *mode);
 
 int main (int argc, char *argv[])
@@ -17,10 +10,10 @@ int main (int argc, char *argv[])
     char fileName[255];
     int size = 0;
     char *theToken;
-    int i, j;
+    int i, j, k;
+    k = 0;
     int numRows = 0;
     int numCols = 0;
-    char *temp;
     char current_char = '*';
     char to_replace = '\n';
     char replacement = ' ';
@@ -49,35 +42,27 @@ int main (int argc, char *argv[])
         fprintf(filePtr, "%c", to_replace);
         rewind(filePtr); //Go back to the start of the stream
         fgets(string, size, filePtr);
-        printf("%s\n", string);
+//        printf("%s\n", string);
           /*It works up till here*/
 
     char array[numRows][numCols][50]; //Creating the 3D array
         theToken = strtok(string, ",");
+        strcpy(array[0][0], theToken);
         while (theToken != NULL) {
-            printf("%s ", theToken);
-            theToken = strtok(NULL, ",");
+            for(i=0; i < (numRows + 1); i++) {
+                for(j=1; j < (numCols + 1); j++) {
+                    theToken = strtok(NULL, ",");
+                    strcpy(array[i][j], theToken);
+                   // printf("%s %d %d\n", array[i][j], i, j);
+                   k++;
+                }
             }
         }
-
+        printf("*******************%d****************", k);
 /*
-        theToken = strtok(string, ",");
-        for(i=0; i<numRows; i++) {
-            for(j=1; j<numCols; j++) {
-                theToken = strtok(NULL, ",");
-                temp = &array[i][j][50]; //pointer
-                if (theToken != NULL) {
-                    strcpy(temp, theToken);
-                }
-                else {
-                    strcpy(temp, "0");
-                }
-            }
-        }
-*/
-/*        for(i=0; i<numRows; i++) { //This should print the array
+        for(i=0; i<numRows; i++) { //This should print the array
             for(j=0; j<numCols; j++) {
-                printf("%s ", array[i][j][50]);
+                printf("%s ", array[i][j]);
             }
         }
 */
