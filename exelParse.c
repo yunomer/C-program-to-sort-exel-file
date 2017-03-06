@@ -3,17 +3,17 @@
 #include <string.h>
 
 FILE *filePointer(char fileName[], char *mode);
+void parseLine (char string[], char ***array, int numRows, int numCols);
 
 int main (int argc, char *argv[])
 {
     FILE *filePtr = NULL;
     char fileName[255];
     int size = 0;
-    char *theToken;
-    int i, j, k;
-    k = 0;
+    int i, j;
     int numRows = 0;
     int numCols = 0;
+    char ***array = NULL;
     char current_char = '*';
     char to_replace = '\n';
     char replacement = ' ';
@@ -38,34 +38,24 @@ int main (int argc, char *argv[])
                 fprintf(filePtr, "%c", replacement);
             }
         }
-        fseek(filePtr, -2, SEEK_END); //Insert the newline char at the end again.
+        fseek(filePtr, -2, SEEK_END); //Insert the newline char at the end to input.
         fprintf(filePtr, "%c", to_replace);
         rewind(filePtr); //Go back to the start of the stream
         fgets(string, size, filePtr);
-//        printf("%s\n", string);
-          /*It works up till here*/
-
-    char array[numRows][numCols][50]; //Creating the 3D array
-        theToken = strtok(string, ",");
-        strcpy(array[0][0], theToken);
-        while (theToken != NULL) {
-            for(i=0; i < (numRows + 1); i++) {
-                for(j=1; j < (numCols + 1); j++) {
-                    theToken = strtok(NULL, ",");
-                    strcpy(array[i][j], theToken);
-                   // printf("%s %d %d\n", array[i][j], i, j);
-                   k++;
-                }
+        string[strlen(string) - 1] = '\0';//removing the new line char now
+        array = malloc(sizeof(char**) * numRows); //Mallocing the 3D array
+        for (i=0; i < numRows; i++) {
+            array[i] = malloc(sizeof(char*) * numCols);
+            for (j=0; j < numCols; j++) {
+                array[i][j] = malloc(sizeof(char) * 50);
             }
         }
-        printf("*******************%d****************", k);
-/*
-        for(i=0; i<numRows; i++) { //This should print the array
-            for(j=0; j<numCols; j++) {
-                printf("%s ", array[i][j]);
+        parseLine(string, array, numRows, numCols); //Sending the string to be put into an array
+        for (i=0; i < 2; i++) {
+            for (j=0; j < numCols; j++) {
+                printf("%s %d %d\n", array[i][j], i, j);
             }
         }
-*/
     fclose(filePtr);
     return 0;
 }
@@ -81,4 +71,38 @@ FILE *filePointer(char fileName[], char *mode)
             printf("Exiting Program\n");
         }
     return tempFile;
+}
+
+void parseLine (char string[], char ***array, int numRows, int numCols)
+{ //This function will parse the MEGA string and move them to the 3D array.
+    int i = 0;
+    int j = 0;
+    int k = 0; //position in the string
+    int m = 0;
+    int length = strlen(string);
+    //array[0][0][0] = string[0]; //Moving the 0 to array position 0 0.
+        for (i = 0; i < numRows; i++) { //Now parsing the rest of the string
+            for (j = 0; j < numCols; j++) {
+                if(string[0] != ',') {
+                    array[0][0][0] = string[0];
+                    j++;
+                }
+                for (k = k; k < length; k++) { //This will find the position of the ',' in the string
+                    if (string[k] == ',') {
+                        break;
+                    }
+                }
+                k++; //Move to the next character in the string
+                for (k = k; k < length; k++) {
+                    if (string[k] != ',') { //As long as the character at position k is not ',' I copy into the array position i j
+                        array[i][j][m] = string[k]; //Copying char by char
+                        m++;
+                    }
+                    else {
+                        m = 0;
+                        break; //The moment the index if the next comma is reached, break loop
+                    }
+                }
+            }
+        }
 }
