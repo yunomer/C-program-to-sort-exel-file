@@ -16,7 +16,7 @@ int main (int argc, char *argv[])
     char ***array = NULL;
     char current_char = '*';
     char to_replace = '\n';
-    char replacement = ' ';
+    char replacement = ',';
         if(argc < 2) {
             strcpy (fileName, "NO FILE INPUT");
         }
@@ -25,7 +25,7 @@ int main (int argc, char *argv[])
         }
         filePtr = filePointer (fileName, "r+"); /*Call to function to find file pointer*/
         fseek (filePtr, 0, SEEK_END); //Going to the end of the file to find size
-        size = ((ftell(filePtr)) + 2); //Storing the file size in variable
+        size = ((ftell(filePtr))); //Storing the file size in variable
         rewind(filePtr); //Rewinding back to the start of the file
     char string[size];
         printf("Please enter the number of Rows\n"); //Asking user for the numRows to create array
@@ -38,11 +38,12 @@ int main (int argc, char *argv[])
                 fprintf(filePtr, "%c", replacement);
             }
         }
-        fseek(filePtr, -2, SEEK_END); //Insert the newline char at the end to input.
+        fseek(filePtr, -1, SEEK_END); //Insert the newline char at the end to input.
         fprintf(filePtr, "%c", to_replace);
         rewind(filePtr); //Go back to the start of the stream
         fgets(string, size, filePtr);
-        string[strlen(string) - 1] = '\0';//removing the new line char now
+ // printf("%s", string);
+       // string[strlen(string) - 1] = '\0';//removing the new line char now
         array = malloc(sizeof(char**) * numRows); //Mallocing the 3D array
         for (i=0; i < numRows; i++) {
             array[i] = malloc(sizeof(char*) * numCols);
@@ -51,11 +52,13 @@ int main (int argc, char *argv[])
             }
         }
         parseLine(string, array, numRows, numCols); //Sending the string to be put into an array
-        for (i=0; i < 2; i++) {
+
+        for (i=0; i < numRows; i++) {
             for (j=0; j < numCols; j++) {
-                printf("%s %d %d\n", array[i][j], i, j);
+                printf("%s %d %d\n", array[i][j], (i+1), (j+1));
             }
         }
+
     fclose(filePtr);
     return 0;
 }
@@ -79,13 +82,14 @@ void parseLine (char string[], char ***array, int numRows, int numCols)
     int j = 0;
     int k = 0; //position in the string
     int m = 0;
+    int y = 0;
     int length = strlen(string);
-    //array[0][0][0] = string[0]; //Moving the 0 to array position 0 0.
         for (i = 0; i < numRows; i++) { //Now parsing the rest of the string
             for (j = 0; j < numCols; j++) {
-                if(string[0] != ',') {
+		if((string[0] != ',') && (y == 0)) {
                     array[0][0][0] = string[0];
                     j++;
+                    y = 1;
                 }
                 for (k = k; k < length; k++) { //This will find the position of the ',' in the string
                     if (string[k] == ',') {
@@ -97,6 +101,9 @@ void parseLine (char string[], char ***array, int numRows, int numCols)
                     if (string[k] != ',') { //As long as the character at position k is not ',' I copy into the array position i j
                         array[i][j][m] = string[k]; //Copying char by char
                         m++;
+                    }
+                    else if (string[k] == '\n') {
+                        array[i][j][m] = '1';
                     }
                     else {
                         m = 0;
